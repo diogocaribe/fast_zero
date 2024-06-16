@@ -33,11 +33,12 @@ select = [
     "SIM",
     # isort
     "I",
+    'W', 'PL', 'PT'
 ]
 
 [tool.ruff.format]
-quote-style = "single"
-indent-style = "tab"
+preview = true
+quote-style = 'single'
 docstring-code-format = true
 
 [tool.pytest.ini_options]
