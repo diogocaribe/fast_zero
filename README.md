@@ -1,0 +1,1 @@
+Este projeto é parte do curso Live Pytho para construção de Api com FastAPI.
