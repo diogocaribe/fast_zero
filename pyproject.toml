@@ -17,6 +17,34 @@ ruff = "^0.4.9"
 line-lenfth = 79
 extend-exclude = ['migrations']
 
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.4.9"
+
+[tool.roof]
+line-lenfth = 79
+extend-exclude = ['migrations']
+
+[tool.ruff.lint]
+select = [
+    # pycodestyle
+    "E",
+    # Pyflakes
+    "F",
+    # pyupgrade
+    "UP",
+    # flake8-bugbear
+    "B",
+    # flake8-simplify
+    "SIM",
+    # isort
+    "I",
+]
+
+[tool.ruff.format]
+quote-style = "single"
+indent-style = "tab"
+docstring-code-format = true
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
