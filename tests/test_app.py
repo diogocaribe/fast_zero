@@ -74,3 +74,10 @@ def test_update_user_id_not_found(client):
     # assert response.status_code == HTTPStatus.OK
 
     assert response.status_code == HTTPStatus.NOT_FOUND
+
+
+def test_delete_user(client):
+    response = client.delete('/users/1')
+
+    assert response.status_code == HTTPStatus.OK
+    assert response.json() == {'message': 'User deleted'}
