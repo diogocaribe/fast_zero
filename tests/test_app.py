@@ -1,15 +1,5 @@
 from http import HTTPStatus
 
-import pytest
-from fastapi.testclient import TestClient
-
-from fast_zero.app import app
-
-
-@pytest.fixture()
-def client():
-    return TestClient(app)
-
 
 def test_read_root_deve_retornar_ok_ola_mundo(client):
     # Fases do test
@@ -19,7 +9,7 @@ def test_read_root_deve_retornar_ok_ola_mundo(client):
 
 
 def test_create_user(client):
-    user_test = { # UserSchema
+    user_test = {  # UserSchema
         'username': 'usernameteste',
         'email': 'emailteste@test.com',
         'password': 'password',
