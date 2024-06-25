@@ -4,7 +4,7 @@ from http import HTTPStatus
 
 from fastapi import FastAPI
 
-from fast_zero.schemas import Message, UserDb, UserPublic, UserSchema
+from fast_zero.schemas import Message, UserDb, UserList, UserPublic, UserSchema
 
 app = FastAPI()
 
@@ -26,3 +26,8 @@ def create_user(user: UserSchema):  # Schema pydantic do user e validação
     database.append(user_with_id)
 
     return user_with_id
+
+
+@app.get('/users/', response_model=UserList)
+def read_user():
+    return {'users': database}
