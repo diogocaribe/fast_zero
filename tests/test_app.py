@@ -1,24 +1,25 @@
 from http import HTTPStatus
 
+import pytest
 from fastapi.testclient import TestClient
 
 from fast_zero.app import app
 
 
-def test_read_root_deve_retornar_ok_ola_mundo():
+@pytest.fixture()
+def client():
+    return TestClient(app)
+
+
+def test_read_root_deve_retornar_ok_ola_mundo(client):
     # Fases do test
-    client = TestClient(app)  # Arragen (organização)
     response = client.get('/')  # Act (Ação)
     # Afirmação (garantir)
     assert response.json() == {'message': 'Olá mundo'}
 
 
-def test_create_user():
-    # Fases do test
-    client = TestClient(app)  # Arragen (organização)
-    # Act (Ação)
-    # Afirmação (garantir)
-    user_test = {
+def test_create_user(client):
+    user_test = { # UserSchema
         'username': 'usernameteste',
         'email': 'emailteste@test.com',
         'password': 'password',
