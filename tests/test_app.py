@@ -20,7 +20,7 @@ def test_create_user(client):
         'username': 'usernameteste',
         'email': 'emailteste@test.com',
     }
-    response = client.post('/user/', json=user_test)
+    response = client.post('/users/', json=user_test)
     assert response.status_code == HTTPStatus.CREATED
     assert response.json() == user_response
 
@@ -81,3 +81,33 @@ def test_delete_user(client):
 
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {'message': 'User deleted'}
+
+
+def test_get_user_id_not_found(client):
+    client.post(
+        '/users/1',
+        json={'password': '123', 'username': 'nematest', 'email': 'teste@teste.com'},
+    )
+
+    response = client.get('/users/1')
+
+    assert response.status_code == HTTPStatus.NOT_FOUND
+
+
+def test_get_user_id(client):
+    user_test = {  # UserSchema
+        'username': 'usernameteste',
+        'email': 'emailteste@test.com',
+        'password': 'password',
+    }
+
+    user_response = {
+        'id': 2,
+        'username': 'usernameteste',
+        'email': 'emailteste@test.com',
+    }
+    client.post('/users/', json=user_test)
+    client.post('/users/', json=user_test)
+    response = client.get('/users/2')
+
+    assert response.json() == user_response

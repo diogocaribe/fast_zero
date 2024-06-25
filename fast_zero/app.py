@@ -16,7 +16,7 @@ def read_root():
     return {'message': 'Olá mundo'}
 
 
-@app.post('/user/', status_code=HTTPStatus.CREATED, response_model=UserPublic)
+@app.post('/users/', status_code=HTTPStatus.CREATED, response_model=UserPublic)
 def create_user(user: UserSchema):  # Schema pydantic do user e validação
     user_with_id = UserDb(
         id=len(database) + 1,  # Criando o id com o len não podendo ser 0
@@ -51,3 +51,11 @@ def delete_user(user_id: int):
 
     del database[user_id - 1]
     return {'message': 'User deleted'}
+
+
+@app.get('/users/{user_id}', response_model=UserPublic)
+def get_user(user_id: int):
+    if user_id > len(database) or user_id < 1:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='User not found')
+
+    return database[user_id - 1]
