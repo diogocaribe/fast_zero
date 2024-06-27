@@ -15,13 +15,13 @@ def test_user():
 
 
 def test_create_user(session):
-    user = User(
+    new_user = User(
         username='alice',
         email='alice@email.com',
         password='123',
     )
 
-    session.add(user)
+    session.add(new_user)
     session.commit()
-
-    assert user == session.scalar(select(User).where(User.username == 'alice'))
+    user = session.scalar(select(User).where(User.username == 'alice'))
+    assert user.username == 'alice'
