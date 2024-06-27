@@ -15,11 +15,7 @@ def test_model_table_user():
 
 
 def test_create_user(session):
-    new_user = User(
-        username='alice',
-        email='alice@email.com',
-        password='123'
-    )
+    new_user = User(username='alice', email='alice@email.com', password='123')
 
     session.add(new_user)
     session.commit()
@@ -28,11 +24,7 @@ def test_create_user(session):
 
 
 def test_update_user(session):
-    new_user = User(
-        username='alice',
-        email='alice@email.com',
-        password='123'
-    )
+    new_user = User(username='alice', email='alice@email.com', password='123')
 
     session.add(new_user)
     session.commit()
