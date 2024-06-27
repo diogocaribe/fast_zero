@@ -17,7 +17,7 @@ pytest-cov = "^5.0.0"
 taskipy = "^1.12.2"
 
 [tool.roof]
-line-lenfth = 79
+line-lenfth = 100
 extend-exclude = ['migrations']
 
 [tool.ruff.lint]
