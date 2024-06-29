@@ -28,13 +28,7 @@ def test_create_user(client):
 def test_read_users(client):
     response = client.get('/users/')
     lista_users = {
-        'users': [
-            {
-                'id': 1,
-                'username': 'usernameteste',
-                'email': 'emailteste@test.com',
-            }
-        ]
+        'users': []
     }
     assert response.status_code == HTTPStatus.OK
     assert response.json() == lista_users
