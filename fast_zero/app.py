@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from fast_zero.database import get_session
 from fast_zero.models import User
-from fast_zero.schemas import Message, UserDb, UserList, UserPublic, UserSchema
+from fast_zero.schemas import Message, UserList, UserPublic, UserSchema
 
 app = FastAPI()
 
@@ -51,15 +51,19 @@ def read_users(skip: int = 0, limit: int = 10, session: Session = Depends(get_se
     return {'users': database}
 
 
-@app.put('/users/{user_id}', response_model=UserPublic)
-def update_user(user_id: int, user: UserSchema):
-    if user_id > len(database) or user_id < 1:
+@app.put('/users/{user_id}', response_model=UserPublic, status_code=HTTPStatus.CREATED)
+def update_user(
+    user_id: int, user: UserSchema, session: Session = Depends(get_session)
+):
+    user_db = session.scalar(select(User).where(User.id == user_id))
+    if not user_db:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='User not found')
-    user_with_id = UserDb(id=user_id, **user.model_dump())
-
-    database[user_id - 1] = user_with_id
-
-    return user_with_id
+    user_db.username = user.username
+    user_db.email = user.email
+    user_db.password = user.password
+    session.commit()
+    session.refresh(user_db)
+    return user_db
 
 
 @app.delete('/users/{user_id}', response_model=Message)

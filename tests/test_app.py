@@ -47,18 +47,15 @@ def test_read_users_with_user(client, user):
     }
 
 
-def test_update_user(client):
+def test_update_user(client, user):
     response = client.put(
         '/users/1',
         json={
             'password': '123',
             'username': 'nematest',
             'email': 'teste@teste.com',
-            'id': 1,
         },
     )
-
-    # assert response.status_code == HTTPStatus.OK
 
     assert response.json() == {
         'username': 'nematest',
@@ -74,11 +71,8 @@ def test_update_user_id_not_found(client):
             'password': '123',
             'username': 'nematest',
             'email': 'teste@teste.com',
-            'id': 1,
         },
     )
-
-    # assert response.status_code == HTTPStatus.OK
 
     assert response.status_code == HTTPStatus.NOT_FOUND
 
