@@ -1,5 +1,7 @@
 from http import HTTPStatus
 
+from fast_zero.schemas import UserPublic
+
 
 def test_read_root_deve_retornar_ok_ola_mundo(client):
     # Fases do test
@@ -27,11 +29,22 @@ def test_create_user(client):
 
 def test_read_users(client):
     response = client.get('/users/')
-    lista_users = {
-        'users': []
-    }
+    lista_users = {'users': []}
     assert response.status_code == HTTPStatus.OK
     assert response.json() == lista_users
+
+
+def test_read_users_with_user(client, user):
+    response = client.get('/users/')
+    # assert response.status_code() == HTTPStatus.OK
+    user_schema = UserPublic.model_validate(user).model_dump()
+    print(user_schema)
+    assert response.json() == {
+        'users': [
+            # UserPublic
+            user_schema
+        ]
+    }
 
 
 def test_update_user(client):
