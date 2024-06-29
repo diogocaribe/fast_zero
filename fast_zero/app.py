@@ -3,7 +3,12 @@
 from http import HTTPStatus
 
 from fastapi import FastAPI, HTTPException
+from fastapi.params import Depends
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 
+from fast_zero.database import get_session
+from fast_zero.models import User
 from fast_zero.schemas import Message, UserDb, UserList, UserPublic, UserSchema
 
 app = FastAPI()
@@ -17,15 +22,27 @@ def read_root():
 
 
 @app.post('/users/', status_code=HTTPStatus.CREATED, response_model=UserPublic)
-def create_user(user: UserSchema):  # Schema pydantic do user e validação
-    user_with_id = UserDb(
-        id=len(database) + 1,  # Criando o id com o len não podendo ser 0
-        **user.model_dump(),  # Construindo o dict a partir do
+def create_user(user: UserSchema, session: Session = Depends(get_session)):
+    user_db = session.scalar(
+        select(User).where(
+            (User.username == user.username) | (User.email == user.email)
+        )
     )
+    if user_db:
+        if user_db.username == user.username:
+            raise HTTPException(
+                HTTPStatus.BAD_REQUEST, detail='Username already exists'
+            )
+        elif user_db.email == user.email:
+            raise HTTPException(HTTPStatus.BAD_REQUEST, detail='Email already exists')
 
-    database.append(user_with_id)
+    user_db = User(username=user.username, email=user.email, password=user.password)
 
-    return user_with_id
+    session.add(user_db)
+    session.commit()
+    session.refresh(user_db)
+
+    return user_db
 
 
 @app.get('/users/', response_model=UserList)
