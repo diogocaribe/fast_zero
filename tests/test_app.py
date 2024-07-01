@@ -27,6 +27,28 @@ def test_create_user(client):
     assert response.json() == user_response
 
 
+def test_create_user_already_exist(client, user):
+    user_test = {  # UserSchema
+        'username': 'alice',
+        'email': 'alice@teste.com',
+        'password': 'password',
+    }
+    response = client.post('/users/', json=user_test)
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+    assert response.json() == {'detail': 'Username already exists'}
+
+
+def test_create_user_email_already_exist(client, user):
+    user_test = {  # UserSchema
+        'username': 'alice_',
+        'email': 'alice@teste.com',
+        'password': '123',
+    }
+    response = client.post('/users/', json=user_test)
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+    assert response.json() == {'detail': 'Email already exists'}
+
+
 def test_read_users(client):
     response = client.get('/users/')
     lista_users = {'users': []}
@@ -92,7 +114,6 @@ def test_delete_user_not_found(client, user):
 
 
 def test_get_user_id(client, user):
-
     user_response = {
         'id': 1,
         'username': 'alice',
@@ -105,8 +126,6 @@ def test_get_user_id(client, user):
 
 
 def test_get_user_id_not_found(client, user):
-
     response = client.get('/users/2')
 
     assert response.status_code == HTTPStatus.NOT_FOUND
-
