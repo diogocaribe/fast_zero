@@ -91,31 +91,22 @@ def test_delete_user_not_found(client, user):
     assert response.json() == {'detail': 'User not found'}
 
 
-def test_get_user_id_not_found(client):
-    client.post(
-        '/users/1',
-        json={'password': '123', 'username': 'nematest', 'email': 'teste@teste.com'},
-    )
+def test_get_user_id(client, user):
+
+    user_response = {
+        'id': 1,
+        'username': 'alice',
+        'email': 'alice@teste.com',
+    }
 
     response = client.get('/users/1')
 
-    assert response.status_code == HTTPStatus.NOT_FOUND
+    assert response.json() == user_response
 
 
-def test_get_user_id(client):
-    user_test = {  # UserSchema
-        'username': 'usernameteste',
-        'email': 'emailteste@test.com',
-        'password': 'password',
-    }
+def test_get_user_id_not_found(client, user):
 
-    user_response = {
-        'id': 2,
-        'username': 'usernameteste',
-        'email': 'emailteste@test.com',
-    }
-    client.post('/users/', json=user_test)
-    client.post('/users/', json=user_test)
     response = client.get('/users/2')
 
-    assert response.json() == user_response
+    assert response.status_code == HTTPStatus.NOT_FOUND
+
