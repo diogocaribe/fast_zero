@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from fast_zero.database import get_session
 from fast_zero.models import User
 from fast_zero.schemas import Message, UserList, UserPublic, UserSchema
+from fast_zero.security import get_password_hash
 
 app = FastAPI()
 
@@ -36,7 +37,11 @@ def create_user(user: UserSchema, session: Session = Depends(get_session)):
         elif user_db.email == user.email:
             raise HTTPException(HTTPStatus.BAD_REQUEST, detail='Email already exists')
 
-    user_db = User(username=user.username, email=user.email, password=user.password)
+    user_db = User(
+        username=user.username,
+        email=user.email,
+        password=get_password_hash(user.password),
+    )
 
     session.add(user_db)
     session.commit()
