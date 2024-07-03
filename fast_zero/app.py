@@ -14,8 +14,6 @@ from fast_zero.security import get_password_hash
 
 app = FastAPI()
 
-database = []
-
 
 @app.get('/', status_code=HTTPStatus.OK, response_model=Message)
 def read_root():
