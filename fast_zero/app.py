@@ -63,6 +63,15 @@ def update_user(
     user_db = session.scalar(select(User).where(User.id == user_id))
     if not user_db:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='User not found')
+
+    if user_db:
+        if user_db.username == user.username:
+            raise HTTPException(
+                HTTPStatus.BAD_REQUEST, detail='Username already exists'
+            )
+        elif user_db.email == user.email:
+            raise HTTPException(HTTPStatus.BAD_REQUEST, detail='Email already exists')
+
     user_db.username = user.username
     user_db.email = user.email
     user_db.password = user.password
