@@ -129,3 +129,14 @@ def test_get_user_id_not_found(client, user):
     response = client.get('/users/2')
 
     assert response.status_code == HTTPStatus.NOT_FOUND
+
+
+def test_get_token(client, user):
+    response = client.post(
+        '/token', data={'username': user.email, 'password': user.password}
+    )
+    token = response.json()
+    # Testando se existe o token_type
+    assert token['token_type'] == 'Bearer'
+    # Testando se existe o acess_token
+    assert 'acess_token' in token

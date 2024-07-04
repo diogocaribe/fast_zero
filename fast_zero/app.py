@@ -108,10 +108,15 @@ def login_for_acess_token(
     session: Session = Depends(get_session),
 ):
     user = session.scalar(select(User).where(User.email == form_data.username))
-    # Verificar autorização com senha encriptada
-    if not user or verify_password(form_data.password, user.password):
+    if not user:
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST, detail='Incorrect email or password'
+        )
+    # Verificar autorização com senha encriptada
+    if not verify_password(form_data.password, user.password):
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail='Incorrect email or password'
         )
     # verificar o token
     acess_token = create_access_token(data={'sub': user.email})
