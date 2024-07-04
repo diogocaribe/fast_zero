@@ -145,3 +145,12 @@ def test_get_token(client, user):
     assert token['token_type'] == 'Bearer'
     # Testando se existe o access_token
     assert 'access_token' in token
+
+
+def test_jwt_invalid_token(client):
+    response = client.delete(
+        '/users/1', headers={'Authorization': 'Bearer token-invalido'}
+    )
+
+    assert response.status_code == HTTPStatus.UNAUTHORIZED
+    assert response.json() == {'detail': 'Could not validate credentials'}
