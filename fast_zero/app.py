@@ -2,15 +2,15 @@
 
 from http import HTTPStatus
 
-from fastapi import FastAPI, HTTPException
-from fastapi.params import Depends
+from fastapi import Depends, FastAPI, HTTPException
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from fast_zero.database import get_session
 from fast_zero.models import User
 from fast_zero.schemas import Message, UserList, UserPublic, UserSchema
-from fast_zero.security import get_password_hash
+from fast_zero.security import get_password_hash, verify_password
 
 app = FastAPI()
 
@@ -96,3 +96,23 @@ def get_user(user_id: int, session: Session = Depends(get_session)):
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='User not found')
 
     return user_db
+
+
+# Craindo uma rota da tokerização da aplicação e que será injetada como
+# dependência para os metodos que necessitem de autenticação/autorização
+# A rota de token deve ser post para enviar dados para o servidor
+# É necessário o python-multipart para utilizar o OAuth[...]Form
+@app.post('/token')
+def login_for_acess_token(
+    form_data: OAuth2PasswordRequestForm = Depends(),  # Notação esquisita
+    session: Session = Depends(get_session),
+):
+    user = session.scalar(select(User).where(User.email == form_data.username))
+
+    if not user or verify_password(form_data.password, user.password):
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail='Incorrect email or password'
+            )
+    
+    ...
