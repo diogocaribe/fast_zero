@@ -23,4 +23,4 @@ class User:
     )
 
     def __repr__(self) -> str:
-        return f'User(id={self.id}, name={self.username})'
+        return f'User(username={self.username}, email={self.email})'
