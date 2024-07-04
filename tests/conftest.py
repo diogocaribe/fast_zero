@@ -41,12 +41,14 @@ def session():
 
 @pytest.fixture()
 def user(session):
-    # Esse User abaivo é um modelo do sqlalchemy
+    pwd = '123'
     user = User(
-        username='alice', email='alice@teste.com', password=get_password_hash('123')
+        username='alice', email='alice@teste.com', password=get_password_hash(pwd)
     )
     session.add(user)
     session.commit()
     session.refresh(user)
+
+    user.clean_password = pwd  # Monkey Patch
 
     return user
