@@ -52,3 +52,13 @@ def user(session):
     user.clean_password = pwd  # Monkey Patch
 
     return user
+
+
+@pytest.fixture()
+def token(client, user):
+    response = client.post(
+        '/token',
+        data={'username': user.email, 'password': user.clean_password},
+    )
+    print(response.json())
+    return response.json()['access_token']

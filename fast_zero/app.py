@@ -104,7 +104,7 @@ def get_user(user_id: int, session: Session = Depends(get_session)):
 # A rota de token deve ser post para enviar dados para o servidor
 # É necessário o python-multipart para utilizar o OAuth[...]Form
 @app.post('/token', response_model=Token)
-def login_for_acess_token(
+def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),  # Notação esquisita
     session: Session = Depends(get_session),
 ):
@@ -119,6 +119,6 @@ def login_for_acess_token(
             status_code=HTTPStatus.BAD_REQUEST, detail='Incorrect email or password'
         )
     # verificar o token
-    acess_token = create_access_token(data={'sub': user.email})
+    access_token = create_access_token(data={'sub': user.email})
 
-    return {'acess_token': acess_token, 'token_type': 'Bearer'}
+    return {'access_token': access_token, 'token_type': 'Bearer'}

@@ -11,6 +11,7 @@ from zoneinfo import ZoneInfo
 
 from fast_zero.database import Session, get_session
 from fast_zero.models import User
+from fast_zero.schemas import TokenData
 from fast_zero.settings import Settings
 
 pwd_context = PasswordHash.recommended()
@@ -79,11 +80,11 @@ def get_current_user(
         username = payload.get('sub')
         if not username:
             raise credentials_exception
-        # token_data = TokenData(username=username)
+        token_data = TokenData(username=username)
     except PyJWTError:
         raise credentials_exception
 
-    user = session.scalar(select(User).where(User.email == username.email))
+    user = session.scalar(select(User).where(User.email == token_data.username))
 
     if not user:
         raise credentials_exception

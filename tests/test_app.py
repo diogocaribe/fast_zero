@@ -60,7 +60,6 @@ def test_read_users_with_user(client, user):
     response = client.get('/users/')
     # assert response.status_code() == HTTPStatus.OK
     user_schema = UserPublic.model_validate(user).model_dump()
-    print(user_schema)
     assert response.json() == {
         'users': [
             # UserPublic
@@ -69,26 +68,28 @@ def test_read_users_with_user(client, user):
     }
 
 
-def test_update_user(client, user):
+def test_update_user(client, user, token):
     response = client.put(
-        '/users/1',
+        f'/users/{user.id}',
+        headers={'Authorization': f'Bearer {token}'},
         json={
-            'password': '123',
-            'username': 'nematest',
-            'email': 'teste@teste.com',
+            'username': 'bob',
+            'email': 'bob@example.com',
+            'password': 'mynewpassword',
         },
     )
-
+    assert response.status_code == HTTPStatus.CREATED
     assert response.json() == {
-        'username': 'nematest',
-        'email': 'teste@teste.com',
-        'id': 1,
+        'username': 'bob',
+        'email': 'bob@example.com',
+        'id': user.id,
     }
 
 
-def test_update_user_id_not_found(client):
+def test_update_user_id_not_found(client, token):
     response = client.put(
         '/users/2',
+        headers={'Authorization': f'Bearer {token}'},
         json={
             'password': '123',
             'username': 'nematest',
@@ -96,21 +97,24 @@ def test_update_user_id_not_found(client):
         },
     )
 
-    assert response.status_code == HTTPStatus.NOT_FOUND
+    assert response.status_code == HTTPStatus.BAD_REQUEST
 
 
-def test_delete_user(client, user):
-    response = client.delete('/users/1')
+def test_delete_user(client, user, token):
+    response = client.delete(
+        f'/users/{user.id}',
+        headers={'Authorization': f'Bearer {token}'},
+    )
 
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {'message': 'User deleted'}
 
 
-def test_delete_user_not_found(client, user):
-    response = client.delete('/users/2')
+def test_delete_user_diff_from_logged(client, user, token):
+    response = client.delete('/users/2', headers={'Authorization': f'Bearer {token}'},)
 
-    assert response.status_code == HTTPStatus.NOT_FOUND
-    assert response.json() == {'detail': 'User not found'}
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+    assert response.json() == {'detail': 'Not enough permission'}
 
 
 def test_get_user_id(client, user):
@@ -139,5 +143,5 @@ def test_get_token(client, user):
     assert response.status_code == HTTPStatus.OK
     # Testando se existe o token_type
     assert token['token_type'] == 'Bearer'
-    # Testando se existe o acess_token
-    assert 'acess_token' in token
+    # Testando se existe o access_token
+    assert 'access_token' in token
