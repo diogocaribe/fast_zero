@@ -50,7 +50,9 @@ def user(session):
     session.refresh(user)
 
     user.clean_password = pwd  # Monkey Patch
-
+    # Variaveis criadas para testar security
+    user.wrong_email = 'bob1@email.com'
+    user.wrong_pwd = '1234'
     return user
 
 
@@ -60,5 +62,5 @@ def token(client, user):
         '/auth/token',
         data={'username': user.email, 'password': user.clean_password},
     )
-    print(response.json())
+
     return response.json()['access_token']

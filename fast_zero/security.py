@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from http import HTTPStatus
+from typing import Annotated
 
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
@@ -16,6 +17,7 @@ from fast_zero.settings import Settings
 
 pwd_context = PasswordHash.recommended()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/auth/token')
+T_Session = Annotated[Session, Depends(get_session)]
 
 settings = Settings()
 
@@ -64,7 +66,7 @@ def create_access_token(data: dict) -> None:
 
 
 def get_current_user(
-    session: Session = Depends(get_session),
+    session: T_Session,
     # Isso funciona para exigir que o usuário esteja logado para realizar
     #  alguma operação
     token: str = Depends(oauth2_scheme),
