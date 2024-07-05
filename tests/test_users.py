@@ -98,6 +98,21 @@ def test_update_user_id_not_found(client, user, token):
     assert response.json() == {'detail': 'Could not validate credentials'}
 
 
+def test_update_user_diff_from_logged(client, user, token):
+    response = client.put(
+        f'/users/{user.id + 1}',
+        headers={'Authorization': f'Bearer {token}'},
+        json={
+            'password': '123',
+            'username': 'alice',
+            'email': 'alice@teste.com',
+        },
+    )
+
+    assert response.status_code == HTTPStatus.FORBIDDEN
+    assert response.json() == {'detail': 'Not enough permission'}
+
+
 def test_delete_user(client, user, token):
     response = client.delete(
         f'/users/{user.id}',
@@ -114,7 +129,7 @@ def test_delete_user_diff_from_logged(client, user, token):
         headers={'Authorization': f'Bearer {token}'},
     )
 
-    assert response.status_code == HTTPStatus.BAD_REQUEST
+    assert response.status_code == HTTPStatus.FORBIDDEN
     assert response.json() == {'detail': 'Not enough permission'}
 
 
