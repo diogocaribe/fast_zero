@@ -51,7 +51,7 @@ def test_read_users(client):
 
 def test_read_users_with_user(client, user):
     response = client.get('/users/')
-    # assert response.status_code() == HTTPStatus.OK
+    assert response.status_code == HTTPStatus.OK
     user_schema = UserPublic.model_validate(user).model_dump()
     assert response.json() == {
         'users': [
@@ -141,7 +141,7 @@ def test_get_user_id(client, user):
     }
 
     response = client.get('/users/1')
-
+    assert response.status_code == HTTPStatus.OK
     assert response.json() == user_response
 
 
