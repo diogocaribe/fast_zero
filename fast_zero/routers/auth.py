@@ -1,4 +1,5 @@
 from http import HTTPStatus
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
@@ -12,6 +13,9 @@ from fast_zero.security import create_access_token, verify_password
 
 router = APIRouter(prefix='/auth', tags=['auth'])
 
+T_Session = Annotated[Session, Depends(get_session)]
+T_OAuthForm = Annotated[OAuth2PasswordRequestForm, Depends()]
+
 
 # Craindo uma rota da tokerização da aplicação e que será injetada como
 # dependência para os metodos que necessitem de autenticação/autorização
@@ -19,8 +23,8 @@ router = APIRouter(prefix='/auth', tags=['auth'])
 # É necessário o python-multipart para utilizar o OAuth[...]Form
 @router.post('/token', response_model=Token)
 def login_for_access_token(
-    form_data: OAuth2PasswordRequestForm = Depends(),  # Notação esquisita
-    session: Session = Depends(get_session),
+    session: T_Session,
+    form_data: T_OAuthForm,
 ):
     user = session.scalar(select(User).where(User.email == form_data.username))
     if not user:
