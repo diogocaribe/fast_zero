@@ -22,9 +22,9 @@ def test_create_user(client):
 
 def test_create_user_already_exist(client, user):
     user_test = {  # UserSchema
-        'username': 'alice',
-        'email': 'alice@teste.com',
-        'password': 'password',
+        'username': user.username,
+        'email': user.email,
+        'password': user.password,
     }
     response = client.post('/users/', json=user_test)
     assert response.status_code == HTTPStatus.BAD_REQUEST
@@ -33,9 +33,9 @@ def test_create_user_already_exist(client, user):
 
 def test_create_user_email_already_exist(client, user):
     user_test = {  # UserSchema
-        'username': 'alice_',
-        'email': 'alice@teste.com',
-        'password': '123',
+        'username': 'new_username',
+        'email': user.email,
+        'password': user.password,
     }
     response = client.post('/users/', json=user_test)
     assert response.status_code == HTTPStatus.BAD_REQUEST
@@ -98,9 +98,16 @@ def test_update_user_id_not_found(client, user, token):
     assert response.json() == {'detail': 'Could not validate credentials'}
 
 
-def test_update_user_diff_from_logged(client, user, token):
+def test_update_user_diff_from_logged(client, other_user, token):
+    """Upadte wrong user.
+
+    Args:
+        client (_type_): _description_
+        user (_type_): _description_
+        token (_type_): _description_
+    """
     response = client.put(
-        f'/users/{user.id + 1}',
+        f'/users/{other_user.id}',
         headers={'Authorization': f'Bearer {token}'},
         json={
             'password': '123',
@@ -124,6 +131,13 @@ def test_delete_user(client, user, token):
 
 
 def test_delete_user_diff_from_logged(client, user, token):
+    """Delete wrong user.
+
+    Args:
+        client (_type_): _description_
+        user (_type_): _description_
+        token (_type_): _description_
+    """
     response = client.delete(
         '/users/2',
         headers={'Authorization': f'Bearer {token}'},
@@ -136,8 +150,8 @@ def test_delete_user_diff_from_logged(client, user, token):
 def test_get_user_id(client, user):
     user_response = {
         'id': 1,
-        'username': 'alice',
-        'email': 'alice@teste.com',
+        'username': user.username,
+        'email': user.email,
     }
 
     response = client.get('/users/1')
