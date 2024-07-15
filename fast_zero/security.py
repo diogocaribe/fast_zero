@@ -5,7 +5,7 @@ from typing import Annotated
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jwt import decode, encode
-from jwt.exceptions import PyJWTError
+from jwt.exceptions import DecodeError, ExpiredSignatureError
 from pwdlib import PasswordHash
 from sqlalchemy import select
 from zoneinfo import ZoneInfo
@@ -56,7 +56,7 @@ def create_access_token(data: dict) -> None:
     to_encode = data.copy()
 
     expire = datetime.now(tz=ZoneInfo('UTC')) + timedelta(
-        settings.ACCESS_TOKEN_EXPIRE_MINUTES
+        minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
     )
 
     to_encode.update({'exp': expire})
@@ -70,7 +70,7 @@ def get_current_user(
     # Isso funciona para exigir que o usuário esteja logado para realizar
     #  alguma operação
     token: str = Depends(oauth2_scheme),
-) -> None:
+):
     credentials_exception = HTTPException(
         status_code=HTTPStatus.UNAUTHORIZED,
         detail='Could not validate credentials',
@@ -78,12 +78,14 @@ def get_current_user(
     )
 
     try:
-        payload = decode(token, settings.SECRET_KEY, algorithms=settings.ALGORITHM)
-        username = payload.get('sub')
+        payload = decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        username: str = payload.get('sub')
         if not username:
             raise credentials_exception
         token_data = TokenData(username=username)
-    except PyJWTError:
+    except ExpiredSignatureError:
+        raise credentials_exception
+    except DecodeError:
         raise credentials_exception
 
     user = session.scalar(select(User).where(User.email == token_data.username))
